@@ -1,20 +1,24 @@
 TeamFight Tutor Dev Doc 
 
 Overall: 
-	- Overlay through overwolf using the overwolf api from "overwolf dev" (https://dev.overwolf.com/ow-native/reference/ow-api-overview/ )
-        - Pull and display global stats of winning TFT comps (item, units, traits) the riotapi has specific ID to these attributes 
+	- Overlay through overwolf using the overwolf api (https://dev.overwolf.com/ow-native/reference/ow-api-overview/ )
+        - Pull and display global stats of winning TFT comps (item, units, traits) via riot's api
 
 Specific:
-	- We want to pull and store data (gold, level, units_played) through overwolf api
+	- Pull and store data by round ex: gold, level, units_played via overwolf api
 	- This will be displayed after the game is over. It acts as a review for the user (decide what to do with data later) 
 Bonus: 
 	- perform game analysis with xg boost (python library)
+	    - compare user's performance at stage/round to global stats to provide alternate strategies
+	        ex - when
+Monetization:
+    -Overwolf Ads SDK (https://dev.overwolf.com/ow-native/monetization/advertising/overview)
 
 Tech Stack:
 	- Python 
 	    - pandas
 	    - numpy
-	    - mapplotlib
+	    - matplotlib
 	    - Django
 	    - XG Boost
 	- DB (DataBase) / storage 
