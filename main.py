@@ -1,29 +1,56 @@
 import requests
+import pandas as pd
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 def main():
+    api_key = os.environ.get("test_riot_api_key") #remember to regen this in test environment
+    get_ladder(api_key)
 
-    api_key = "RGAPI-497597d3-45a8-40b4-a41d-2f5b8fd1cbdd" #api key HAS TO BE GENERATED DAILY DURING DEV
-    api_url = "https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/MALCOLM%20SEX/real?api_key=RGAPI-a39b9d2d-83b6-49b1-b810-5653bed232c7" #request url ALSO HAS TO BE REGENERATED ALONG WITH API KEY DURING DEV
-    requests.get(api_url) #send request off
-    api_url + "?api_key=" + api_key  #validate request w key
-    response = requests.get(api_url)
-    player_info = response.json()
-    print(player_info) #above requests validate key and returns id/puuid
-    get_match_history()
+def get_puuid(gameName=None, tagLine=None, api_key=None):
+    link = f'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}?api_key={api_key}'
 
-def get_match_history(): #this function grabs the users 20 most recent games
-    api_url = "https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/F5LZQoF46OKmJCWkco_hW1p57_jwJ6gPIH5JHjFpiU7hxpiGovjkSd-j3CbgqKPRYDvfHt7DlpmooA/ids?start=0&count=20&api_key=RGAPI-a39b9d2d-83b6-49b1-b810-5653bed232c7" #the request URL
-    response = requests.get(api_url)
-    match_history = response.json() #returns a list of recent games
-    print(match_history)
+    response = requests.get(link)
 
-def get_match_data():
-    api_url = 'https://americas.api.riotgames.com/tft/match/v1/matches/NA1_5202132182?api_key=RGAPI-a39b9d2d-83b6-49b1-b810-5653bed232c7'
-    response = requests.get(api_url)
-    match_data = response.json() #returns a dictionary in the format ['metadata', 'info']
-    #NOTE 'info' is also a dictionary with keys being (['endOfGameResult', 'gameCreation', 'gameId', 'game_datetime', 'game_length', 'game_version', 'mapId', 'participants', 'queueId', 'queue_id', 'tft_game_type', 'tft_set_core_name', 'tft_set_number'])
-    print(match_data['metadata'])
+    return response.json()['puuid']
+
+def get_name_tagline(puuid=None, api_key=None):
+    link = f'https://americas.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}?{api_key}'
+
+    response = requests.get(link)
+
+
+    id = {
+        'gameName': response.json()['gameName'],
+        'tagLine': response.json()['tagLine'],
+    }
+    # return id as a dictionary
+    return id
+def get_ladder(api_key=None):
+    api_key = os.environ.get("test_riot_api_key")
+    root = "https://na1.api.riotgames.com/"
+    chall = ("tft/league/v1/challenger?queue=RANKED_TFT")
+    gm = ("tft/league/v1/grandmaster?queue=RANKED_TFT")
+    master = ("tft/league/v1/master?queue=RANKED_TFT") #setup maybe we can make these vars global
+
+    chall_response = requests.get(root + chall + "&api_key=" + api_key)
+    gm_response = requests.get(root + gm + "&api_key=" + api_key)
+    master_response = requests.get(root + master + "&api_key=" + api_key)
+
+    chall_df = pd.DataFrame(chall_response.json()['entries'])
+    gm_df = pd.DataFrame(gm_response.json()['entries'])
+    master_df = pd.DataFrame(master_response.json()['entries'])
+    ladder = pd.concat([chall_df, gm_df, master_df]).reset_index(drop=True)
+    ladder = ladder.drop(columns='rank')
+    ladder = ladder.reset_index(drop=False)
+    ladder = ladder.rename(columns={'index': 'rank'})
+    ladder['rank'] += 1
+    print(ladder) #returns players rank masters+ as a dataframe
 
 main()
 
-#TODO clean up starter code (api key needs to be passed to every function that grabs data)
-#TODO pull data from riot api regarding winning comps (traits, items, and augments (dont display win rate %)
+#TODO - write unencrypt function to get gameName and tagLine from summonerId
+
+#TODO -read over legacy.txt, think about what functions can be readded to main
