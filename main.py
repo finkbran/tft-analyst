@@ -7,7 +7,9 @@ load_dotenv()
 
 def main():
     api_key = os.environ.get("test_riot_api_key") #remember to regen this in test environment
-    get_ladder(api_key)
+    test_puuid = (get_puuid("MALCOLM%20SEX", "real", api_key))
+    print(get_match_history(test_puuid, api_key))
+
 
 def get_puuid(gameName=None, tagLine=None, api_key=None):
     link = f'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}?api_key={api_key}'
@@ -26,8 +28,9 @@ def get_name_tagline(puuid=None, api_key=None):
         'gameName': response.json()['gameName'],
         'tagLine': response.json()['tagLine'],
     }
-    # return id as a dictionary
+    # return id as a dictionary key gameName value tagLine
     return id
+
 def get_ladder(api_key=None):
     api_key = os.environ.get("test_riot_api_key")
     root = "https://na1.api.riotgames.com/"
@@ -48,6 +51,12 @@ def get_ladder(api_key=None):
     ladder = ladder.rename(columns={'index': 'rank'})
     ladder['rank'] += 1
     print(ladder) #returns players rank masters+ as a dataframe
+
+def get_match_history(puuid=None,api_key=None, start = 0, count = 20): #this function grabs the users 20 most recent games
+    api_url = f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?{start}&{count}&api_key={api_key}" #the request URL
+    response = requests.get(api_url)
+    match_history = response.json() #returns a list of recent games (default is 0-20, but can be changed by user)
+    print(match_history)
 
 main()
 
