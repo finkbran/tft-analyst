@@ -9,6 +9,7 @@ def main():
     api_key = os.environ.get("test_riot_api_key") #remember to regen this in test environment
     test_puuid = (get_puuid("MALCOLM%20SEX", "real", api_key))
     print(get_match_history(test_puuid, api_key))
+    print(get_match_data("NA1_5184780757", api_key))
 
 
 def get_puuid(gameName=None, tagLine=None, api_key=None):
@@ -32,7 +33,6 @@ def get_name_tagline(puuid=None, api_key=None):
     return id
 
 def get_ladder(api_key=None):
-    api_key = os.environ.get("test_riot_api_key")
     root = "https://na1.api.riotgames.com/"
     chall = ("tft/league/v1/challenger?queue=RANKED_TFT")
     gm = ("tft/league/v1/grandmaster?queue=RANKED_TFT")
@@ -58,7 +58,7 @@ def get_match_history(puuid=None,api_key=None, start = 0, count = 20): #this fun
     match_history = response.json() #returns an array of recent games (default is 0-20, but can be changed by user)
     print(match_history)
     return match_history
-def get_match_data(match_id=None, api_key=None,):
+def get_match_data(match_id=None, api_key=None,): #look at regions to allow options - or should it lock to user's region?
     api_url = f'https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={api_key}'
     response = requests.get(api_url)
     match_data = response.json() #returns a dictionary in the format ['metadata', 'info']
@@ -69,5 +69,5 @@ def get_match_data(match_id=None, api_key=None,):
 main()
 
 #TODO - write unencrypt function to get gameName and tagLine from summonerId
-
+#TODO - write function to make sense of data returned from get_match_data
 #TODO -read over legacy.txt, think about what functions can be readded to main
