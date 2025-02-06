@@ -55,8 +55,16 @@ def get_ladder(api_key=None):
 def get_match_history(puuid=None,api_key=None, start = 0, count = 20): #this function grabs the users 20 most recent games
     api_url = f"https://americas.api.riotgames.com/tft/match/v1/matches/by-puuid/{puuid}/ids?{start}&{count}&api_key={api_key}" #the request URL
     response = requests.get(api_url)
-    match_history = response.json() #returns a list of recent games (default is 0-20, but can be changed by user)
+    match_history = response.json() #returns an array of recent games (default is 0-20, but can be changed by user)
     print(match_history)
+    return match_history
+def get_match_data(match_id=None, api_key=None,):
+    api_url = f'https://americas.api.riotgames.com/tft/match/v1/matches/{match_id}?api_key={api_key}'
+    response = requests.get(api_url)
+    match_data = response.json() #returns a dictionary in the format ['metadata', 'info']
+    #NOTE 'info' is also a dictionary with keys being (['endOfGameResult', 'gameCreation', 'gameId', 'game_datetime', 'game_length', 'game_version', 'mapId', 'participants', 'queueId', 'queue_id', 'tft_game_type', 'tft_set_core_name', 'tft_set_number'])
+    print(match_data['metadata'])
+    return match_data
 
 main()
 
