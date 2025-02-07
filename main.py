@@ -7,9 +7,11 @@ load_dotenv()
 
 def main():
     api_key = os.environ.get("test_riot_api_key") #remember to regen this in test environment
-    test_puuid = (get_puuid("MALCOLM%20SEX", "real", api_key))
-    print(get_match_history(test_puuid, api_key))
-    print(get_match_data("NA1_5184780757", api_key))
+    test_puuid = (get_puuid("Spica", "001", api_key))
+    #print(get_match_history(test_puuid, api_key))
+    #print(get_match_data("NA1_5184780757", api_key))
+    print(test_puuid)
+    print(os.getcwd())
 
 
 def get_puuid(gameName=None, tagLine=None, api_key=None):
@@ -42,7 +44,7 @@ def get_ladder(api_key=None):
     gm_response = requests.get(root + gm + "&api_key=" + api_key)
     master_response = requests.get(root + master + "&api_key=" + api_key)
 
-    chall_df = pd.DataFrame(chall_response.json()['entries'])
+    chall_df = pd.DataFrame(chall_response.json()['entries']) #convert api response to a dataframe for chall-master
     gm_df = pd.DataFrame(gm_response.json()['entries'])
     master_df = pd.DataFrame(master_response.json()['entries'])
     ladder = pd.concat([chall_df, gm_df, master_df]).reset_index(drop=True)
@@ -65,6 +67,16 @@ def get_match_data(match_id=None, api_key=None,): #look at regions to allow opti
     #NOTE 'info' is also a dictionary with keys being (['endOfGameResult', 'gameCreation', 'gameId', 'game_datetime', 'game_length', 'game_version', 'mapId', 'participants', 'queueId', 'queue_id', 'tft_game_type', 'tft_set_core_name', 'tft_set_number'])
     print(match_data['metadata'])
     return match_data
+
+def individual_match_info(match_id=None, api_key=None, puuid=None): #not functional yet, this function will grab data from an individual match, units, traits played, etc
+    game = get_match_data(match_id, api_key)
+    metadata = game['metadata']
+    info = game['info']
+    participants = metadata['participants']
+    game_version = metadata['data_version']
+    players = info['participants']
+    #not functional yet
+    player = players[participants.index(puuid)]
 
 main()
 
