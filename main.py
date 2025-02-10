@@ -76,13 +76,11 @@ def individual_match_info(match_id=None, api_key=None, puuid=None): #not functio
     #not functional yet
     player = players[participants.index(puuid)]
 
-def live_game_info(api_key=None):
-    metadata = game['metadata']
-    info = game['info']
-    match_id = metadata['match_id']
-    participants = metadata['participants']
-    game_version = metadata['data_version']
-    players = info['participants']
+def live_game_info(api_key=None): #this is a demo of
+    #match_id = metadata['match_id']
+    #participants = metadata['participants']
+   # game_version = metadata['data_version']
+    #players = info['participants']
     player_info = input("Enter a player name and tagline separated by '#' (ex MALCOLM SEX#real): ")
     player_info = player_info.split('#')
     if len(player_info) < 2:
@@ -93,12 +91,12 @@ def live_game_info(api_key=None):
         puuid = get_puuid(player_name, tagline, api_key)
         print(get_match_history(puuid, api_key))
         match_num = input("Enter a match ID: ")
-        get_match_data(match_num, api_key)
-        metadata = game['metadata']
+        game = get_match_data(match_num, api_key)
+        #metadata = game['metadata']
         info = game['info']
-        match_id = metadata['match_id']
-        participants = metadata['participants']
-        game_version = metadata['data_version']
+        #match_id = metadata['match_id']
+        #participants = metadata['participants']
+        #game_version = metadata['data_version']
         players = info['participants']
         df_players = pd.DataFrame.from_dict(players)
         df_players = df_players.drop(columns="companion")
@@ -121,6 +119,7 @@ def live_game_info(api_key=None):
         players_in_match["RiotName"] = players_units.apply(
             lambda row: row['riotIdGameName'] + "#" + row['riotIdTagline'], axis=1)
         players_in_match.drop(columns=['riotIdGameName', 'riotIdTagline'], inplace=True)
+        print(players_units["RiotName"].unique())
         specific_player = input("Enter a player name and tagline separated by '#': ")
         records = []
         for _, row in players_in_match.iterrows():
@@ -140,7 +139,7 @@ def live_game_info(api_key=None):
             tier = row["tier"]
             items = row["items"]
 
-            # Format the items list into a string (if empty, show "None")
+            #turn items list into a string
             items_str = ", ".join(items) if items else "None"
             print(f"Unit: {unit}")
             print(f"Tier: {tier}")
